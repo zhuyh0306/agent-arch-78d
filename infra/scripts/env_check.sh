@@ -65,9 +65,18 @@ check_litellm_auth() {
   fi
 }
 
+# Docker Desktop is banned on this machine; podman is the runtime. Keep both
+# branches so the script still works on a normal Docker host.
+if command -v podman >/dev/null 2>&1; then
+  compose="podman compose"
+else
+  compose="docker compose"
+fi
+
 echo "containers"
-if docker compose ps --status running --format '{{.Name}}' 2>/dev/null | grep -q .; then
-  docker compose ps --status running --format '  {{.Name}}  {{.Status}}' 2>/dev/null
+listing=$($compose ps 2>/dev/null | tail -n +2)
+if [ -n "$listing" ]; then
+  printf '%s\n' "$listing" | sed 's/^/  /'
 else
   echo "  (none running)"
 fi

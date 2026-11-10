@@ -36,12 +36,23 @@ ollama pull qwen2.5:0.5b
 
 换成 OpenAI / DeepSeek 只需要改 `litellm/config.yaml` 的 `model` 与 `api_key`，compose 不用动。
 
+## 运行时
+
+本机 Docker Desktop 被公司策略禁用，统一用 podman：
+
+- `podman 6.1.4` + `podman-compose 1.6.0`，`podman compose` 会调用这个外部 provider。
+- VM 不会开机自启，先 `podman machine start`，用 `podman machine list` 确认 `Currently running`。
+- compose 文件名仍叫 `docker-compose.yml`（podman-compose 直接读），不要重命名。
+- 容器内访问宿主 Ollama 用 `host.docker.internal:11434`，podman 下它与 `host.containers.internal` 都解析到 VM 网关（192.168.127.254），实测 VM 内 `curl` 返回 200；Ollama 只绑宿主 `127.0.0.1:11434` 也能通，靠的是 podman 的转发，不需要改 Ollama 监听地址。
+- 脚本里的容器列表会优先用 `podman compose`，没有 podman 时回退 `docker compose`。
+
 ## 运行
 
 ```bash
 cp .env.example .env      # 首次；填好各项，尤其是 64 位 hex 的 LANGFUSE_ENCRYPTION_KEY
+podman machine start      # VM 未运行时
 ./scripts/env_check.sh    # 起服务之前应当全红，用来确认脚本本身有效
-docker compose up -d      # 在 infra/ 下执行；首次会拉镜像，超过 15 分钟按止损规则处理
+podman compose up -d      # 在 infra/ 下执行；首次会拉镜像，超过 15 分钟按止损规则处理
 ./scripts/env_check.sh    # 期望全部通过
 ./scripts/smoke.sh        # completion + Langfuse trace
 ```
@@ -51,8 +62,8 @@ docker compose up -d      # 在 infra/ 下执行；首次会拉镜像，超过 1
 停止与清理：
 
 ```bash
-docker compose down          # 保留数据卷
-docker compose down -v       # 连数据一起删，下次重新初始化 Langfuse 项目
+podman compose down          # 保留数据卷
+podman compose down -v       # 连数据一起删，下次重新初始化 Langfuse 项目
 ```
 
 ## 止损

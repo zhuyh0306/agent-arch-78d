@@ -2,6 +2,8 @@
 
 日期：2026-11-10 ｜ 计划时长 90min
 
+> 注：Day 3 起本机 Docker 被公司策略禁用，运行时改为 podman。下文验证表里的 `docker compose config -q` 记录的是当时的命令，现在等价于 `podman compose config -q`。
+
 今日验收物：`repo 骨架` + `docs/adr/0001~0003`
 
 ## 三条笔记

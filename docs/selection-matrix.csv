@@ -1,0 +1,5 @@
+name,cost,ops,eco,exit,fam
+SQLite,5,5,3,5,4
+Postgres,4,3,5,4,5
+PG+pgvector,4,3,4,4,4
+Qdrant,3,2,4,3,3

@@ -34,10 +34,15 @@
 - **操作** 写 `docker-compose.yml` 一次拉起全部依赖服务，并用一条 completion 证明「网关通 + trace 通」。
 - **复述** ADR 记的是「为什么」，代码只记「是什么」；每篇 ADR 至少包含背景、选项、决策、后果。
 - **复述** 选型矩阵五个维度：成本 / 运维 / 生态 / **退出成本** / 团队熟悉度；退出成本优先于性能峰值。
+- **操作** 选型矩阵：四候选 × 五维打分落成 CSV，权重写在脚本里可改一个数重算；每个争议格必须有一句话证据，撑不住就标「待实测」。
+- **复述** SQLite 分最高却被排除的结构性原因（库级写锁 + 无 RLS），以及 Postgres 胜出靠的是「本来就要跑，复用它不新增服务」而不是性能。
+- **复述** pgvector 与 Qdrant 的分界线：500 万向量 / 复杂 payload 过滤 / 按租户独立扩缩，任一触发才换库。
+- **操作** pgvector 带 `WHERE` 的 HNSW 是 post-filter，默认 `ef_search=40` 下匹配 10% 行平均只回 4 条，需开 `hnsw.iterative_scan`；`m`/`ef_construction` 改索引，`ef_search` 不改索引；维度上限 vector 2000 / halfvec 4000。
+- **复述** Temporal Workflow 必须确定性，副作用只能进 Activity；改命令顺序会让老实例重放失败。
 - **复述** 单次问答成本 = system + 工具描述 + 上下文 + 输出；三档测算（单次 / 千次 / 月）。
 - **复述** 三种实现形态的判定顺序：纯代码 → workflow → autonomous agent，先证明「不用 Agent 会怎样」。
 
-**验收**：`docker-compose.yml` + `env_check.sh` 全项通过；成本三档表有数字；3 篇 ADR 落地。
+**验收**：`docker-compose.yml` + `env_check.sh` 全项通过；成本三档表有数字；3 篇 ADR 落地；选型矩阵 CSV + ADR-0004。
 
 **自测**
 

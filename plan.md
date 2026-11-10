@@ -124,25 +124,25 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:24（24min）｜读：Postgres vs SQLite：并发、RLS、运维成本**
 
-- [ ] 📖 精读：Qdrant 官方文档（向量检索） — https://qdrant.tech/documentation/ — 读「文档首页 Manage Data / Search 两块导览」
-- [ ] 📖 精读（补充）：Temporal 文档（持久化工作流） — https://docs.temporal.io/ — 左侧目录 Develop → Workflows：读「Workflow Definition」段（含 deterministic 约束）
-- [ ] 🔍 扫读：pgvector（Postgres 向量扩展） — https://github.com/pgvector/pgvector — README「Querying」小节，只看 <-> 与 <=> 两个距离算子
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：Qdrant 官方文档（向量检索） — https://qdrant.tech/documentation/ — 读「文档首页 Manage Data / Search 两块导览」
+- [x] 📖 精读（补充）：Temporal 文档（持久化工作流） — https://docs.temporal.io/ — 左侧目录 Develop → Workflows：读「Workflow Definition」段（含 deterministic 约束）
+- [x] 🔍 扫读：pgvector（Postgres 向量扩展） — https://github.com/pgvector/pgvector — README「Querying」小节，只看 <-> 与 <=> 两个距离算子
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出（笔记与出处已齐，口述自测待本人）
 
 **00:24–01:17（53min）｜做：做选型矩阵：成本/运维/生态/退出成本/团队熟悉度**
 
-- [ ] 步骤1：做选型矩阵：成本/运维/生态/退出成本/团队熟悉度
-- [ ] 步骤2：给出结论并落 ADR-0004
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：做选型矩阵：成本/运维/生态/退出成本/团队熟悉度
+- [x] 步骤2：给出结论并落 ADR-0004
+- [x] 止损：卡住超过 15 分钟就换实现或查资料
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **01:17–02:00（43min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：选型矩阵表 + ADR-0004 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：选型矩阵表 + ADR-0004 真实存在且可复现
 
 **🗣️ 面试速记**：选型先看退出成本，再看性能峰值｜追问：如果明年要换向量库，代价是什么？
 

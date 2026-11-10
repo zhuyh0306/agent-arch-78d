@@ -1,6 +1,8 @@
 # Day 1｜环境与工具链基线（120min）
 
-> 注：Day 2 已把当天产物归入 `infra/`（`infra/docker-compose.yml`、`infra/scripts/`）。下文保留当时的原始路径作为记录，当前路径以 `infra/README.md` 为准。
+> 注 1：Day 2 已把当天产物归入 `infra/`（`infra/docker-compose.yml`、`infra/scripts/`）。下文保留当时的原始路径作为记录，当前路径以 `infra/README.md` 为准。
+>
+> 注 2：Day 3 起本机 Docker Desktop 被公司策略禁用，运行时改为 `podman 6.1.4 + podman-compose`。下文所有 `docker compose` / `docker stats` 命令等价替换为 `podman compose` / `podman stats`；compose 文件名不变。当时用的 colima VM 已删除，现在是 `podman-machine-default`（4 CPU / 6 GiB），VM 不会开机自启。
 
 日期：2026-11-09
 用时：120 / 120
