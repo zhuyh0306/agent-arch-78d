@@ -1,5 +1,7 @@
 # Day 1｜环境与工具链基线（120min）
 
+> 注：Day 2 已把当天产物归入 `infra/`（`infra/docker-compose.yml`、`infra/scripts/`）。下文保留当时的原始路径作为记录，当前路径以 `infra/README.md` 为准。
+
 日期：2026-11-09
 用时：120 / 120
 今日验收物：`lab/day-01/docker-compose.yml` + `env_check.sh`（全项检查通过）+ 一条真实 completion 与对应 Langfuse trace

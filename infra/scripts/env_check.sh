@@ -3,7 +3,7 @@
 # Exit 0 only when every check passes, so it can gate the smoke test.
 set -u
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 TIMEOUT="${CHECK_TIMEOUT:-3}"
 PASS=0

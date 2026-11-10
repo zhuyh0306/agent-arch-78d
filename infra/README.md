@@ -1,10 +1,13 @@
-# Day 1 · 环境与工具链基线
+# infra · 部署与配置
 
-对应原文 Day 1 的验收物：`docker-compose.yml` + `env_check.sh`（全项检查通过）。
+**放什么**：compose 编排、网关配置、宿主机检查脚本、镜像构建文件。
+**不放什么**：任何业务代码、业务常量、评测数据。
 
-本目录是一次性的学习实验栈，和仓库里的 `curated/` 无关，不要混用端口或数据卷。
+这一层不被代码依赖，只被部署流程引用。
 
-## 服务与端口
+## Day 1 基线栈
+
+Day 1 的验收物就在这里：`docker-compose.yml` + `scripts/env_check.sh`。
 
 | 服务 | 镜像 | 宿主机端口 | 用途 |
 |------|------|-----------|------|
@@ -17,11 +20,11 @@
 | langfuse-worker | `langfuse/langfuse-worker:3` | — | 异步消费事件 |
 | litellm | `ghcr.io/berriai/litellm:main-stable` | 4000 | 模型网关 |
 
-两个说明：
+三个说明：
 
 - 原文列了五个服务，但 Langfuse v3 自己还要 ClickHouse 和 S3，所以实际是 8 个容器。
 - 本机 9000/9001 被一个 SSH 端口转发占用，MinIO 改到 19000/19001，不要去杀那个转发。
-- `docker.io/minio/minio` 和 `quay.io/minio/minio` 在本机都拉不下来（mirror 403 / quay 401），所以用本机已有的 Chainguard 构建；`minio_init.py` 用 LiteLLM 镜像里的 boto3 建桶，替代官方 `mc`。
+- `docker.io/minio/minio` 和 `quay.io/minio/minio` 在本机都拉不下来（mirror 403 / quay 401），所以用本机已有的 Chainguard 构建；`scripts/minio_init.py` 用 LiteLLM 镜像里的 boto3 建桶，替代官方 `mc`。
 
 ## 模型来源
 
@@ -37,13 +40,13 @@ ollama pull qwen2.5:0.5b
 
 ```bash
 cp .env.example .env      # 首次；填好各项，尤其是 64 位 hex 的 LANGFUSE_ENCRYPTION_KEY
-./env_check.sh            # 起服务之前应当全红，用来确认脚本本身有效
-docker compose up -d      # 首次会拉镜像，超过 15 分钟按止损规则处理
-./env_check.sh            # 期望全部通过
-./smoke.sh                # completion + Langfuse trace
+./scripts/env_check.sh    # 起服务之前应当全红，用来确认脚本本身有效
+docker compose up -d      # 在 infra/ 下执行；首次会拉镜像，超过 15 分钟按止损规则处理
+./scripts/env_check.sh    # 期望全部通过
+./scripts/smoke.sh        # completion + Langfuse trace
 ```
 
-打开 <http://localhost:3000>，用 `.env` 里的 `LANGFUSE_ADMIN_EMAIL` / `LANGFUSE_ADMIN_PASSWORD` 登录；trace 也可以在 `smoke.sh` 输出的链接直接打开。
+打开 <http://localhost:3000>，用 `.env` 里的 `LANGFUSE_ADMIN_EMAIL` / `LANGFUSE_ADMIN_PASSWORD` 登录；trace 也可以在 `scripts/smoke.sh` 输出的链接直接打开。
 
 停止与清理：
 

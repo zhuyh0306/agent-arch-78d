@@ -3,7 +3,7 @@
 # trace landed. Ingestion is async, so the trace check polls for a while.
 set -u
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 env_value() {
   sed -n "s/^$1=//p" .env | tail -1

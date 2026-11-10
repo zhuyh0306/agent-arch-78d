@@ -122,7 +122,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
       LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
     volumes:
-      - ./minio_init.py:/init.py:ro
+      - ./scripts/minio_init.py:/init.py:ro
     restart: "no"
 
   langfuse-web:
