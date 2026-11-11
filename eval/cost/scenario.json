@@ -1,0 +1,60 @@
+{
+  "encoding": "o200k_base",
+  "month_volume": 30000,
+  "system": "你是企业数据助手，服务于运营分析。规则：1. 只依据给定的表结构与检索片段回答，字段不存在就说明缺什么，禁止编造。2. 任何汇总都要注明口径与时间范围；缺时间范围时默认最近 30 天并在答案里写明。3. 查询用 run_sql，禁止 SELECT *，单次最多返回 200 行。4. 查询失败最多重试一次，第二次仍失败就停止并报告错误原文。5. 最终答案先给结论，再给 SQL 与口径说明，最后列出不确定性。",
+  "system_en": "You are an enterprise data assistant for operations analytics. Rules: 1. Answer only from the provided schema and retrieved snippets; if a field does not exist, say what is missing, never invent it. 2. Every aggregate must state its definition and time range; when the range is missing, default to the last 30 days and say so. 3. Query with run_sql; no SELECT *; return at most 200 rows. 4. Retry a failed query at most once; if it fails again, stop and report the raw error. 5. Put the conclusion first, then the SQL and definitions, then list the uncertainties.",
+  "tools": [
+    {
+      "name": "run_sql",
+      "description": "在只读副本上执行一条 SQL，最多返回 200 行。禁止 SELECT * 与任何写操作。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sql": {"type": "string", "description": "单条 PostgreSQL 查询语句"},
+          "database": {"type": "string", "enum": ["warehouse"], "description": "固定为 warehouse"}
+        },
+        "required": ["sql"]
+      }
+    },
+    {
+      "name": "describe_table",
+      "description": "查看一张表的字段、类型与注释。写 SQL 之前不确定字段名时先调用。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "table": {"type": "string", "description": "schema.table，例如 dwd.orders"}
+        },
+        "required": ["table"]
+      }
+    },
+    {
+      "name": "search_docs",
+      "description": "在指标口径文档里检索，用于确认指标定义、时间归属和过滤条件。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "检索词，例如 退款率 口径"},
+          "top_k": {"type": "integer", "minimum": 1, "maximum": 8, "default": 3}
+        },
+        "required": ["query"]
+      }
+    }
+  ],
+  "context": [
+    "表结构：dwd.orders(order_id, tenant_id, region, pay_time, pay_amount, status)，status 取值 paid/refunded/closed；退款明细在 dwd.refunds(refund_id, order_id, refund_time, refund_amount, reason)。",
+    "口径：退款率 = 统计期内退款成功订单数 ÷ 同期支付成功订单数；跨月退款按 refund_time 归月，不回溯修改原订单月份；华东区按 region='east' 过滤。",
+    "数据时效：T+1，每日 06:00 前完成分区替换；pay_time 为支付时间，refund_time 为退款完成时间；金额单位为元，含税。"
+  ],
+  "question": "上个月华东区的退款率是多少？跟上上个月比是升还是降？",
+  "history": [
+    {"role": "user", "content": "先看下上个月华东区的支付订单数。"},
+    {"role": "assistant", "content": "调用 run_sql：SELECT count(*) FROM dwd.orders WHERE region='east' AND status='paid' AND pay_time >= date_trunc('month', now()) - interval '1 month' AND pay_time < date_trunc('month', now());"},
+    {"role": "tool", "content": "count\n512384"},
+    {"role": "assistant", "content": "上月华东区支付成功订单 512,384 单。口径：status='paid'，按 pay_time 归月。"},
+    {"role": "user", "content": "再按天拆一下，我要看有没有异常的日子。"},
+    {"role": "assistant", "content": "调用 run_sql：SELECT pay_time::date AS d, count(*) AS orders FROM dwd.orders WHERE region='east' AND status='paid' AND pay_time >= date_trunc('month', now()) - interval '1 month' AND pay_time < date_trunc('month', now()) GROUP BY 1 ORDER BY 1;"},
+    {"role": "tool", "content": "d,orders\n2026-10-01,16021\n2026-10-02,15877\n2026-10-03,15102\n2026-10-04,14988\n2026-10-05,16240\n2026-10-06,17003\n2026-10-07,16845\n2026-10-08,16512\n2026-10-09,16008\n2026-10-10,15990\n2026-10-11,16330\n2026-10-12,16987\n2026-10-13,17102\n2026-10-14,16684\n2026-10-15,16451\n2026-10-16,16790\n2026-10-17,17002\n2026-10-18,16998\n2026-10-19,17139\n2026-10-20,16887\n2026-10-21,16766\n2026-10-22,16540\n2026-10-23,16432\n2026-10-24,16974\n2026-10-25,17211\n2026-10-26,17088\n2026-10-27,16845\n2026-10-28,16699\n2026-10-29,16403\n2026-10-30,16010\n2026-10-31,15920"},
+    {"role": "assistant", "content": "10 月 1–31 日每天都保持在 1.49–1.72 万单，10 月 4 日最低（14,988），10 月 25 日最高（17,211）。没有断崖式下跌；月底两天略低，与 T+1 到数有关。"}
+  ],
+  "output": "结论：上月华东区退款率 3.8%，比上上月的 3.1% 上升 0.7 个百分点。\n口径：退款率 = 当月退款成功订单数 ÷ 当月支付成功订单数，退款按 refund_time 归月，区域取 region='east'。\nSQL：SELECT date_trunc('month', r.refund_time) AS m, count(DISTINCT r.order_id)::numeric / NULLIF(count(DISTINCT o.order_id), 0) AS refund_rate FROM dwd.refunds r JOIN dwd.orders o ON o.order_id = r.order_id WHERE o.region = 'east' AND o.status = 'paid' AND r.refund_time >= date_trunc('month', now()) - interval '2 month' AND r.refund_time < date_trunc('month', now()) GROUP BY 1 ORDER BY 1;\n不确定性：上月最后两天的数据 T+1 才到齐，若缺口超过 1%，结论可能略偏高。"
+}

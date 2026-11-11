@@ -5,5 +5,6 @@
 
 - `datasets/`：回归集，真实分布 + 难度分层 + 边界样本。
 - `scorers/`：打分逻辑，规则打分与 LLM-as-judge 都放这里。
+- `cost/`：成本基线。`scenario.json` 是待测问答，`prices.csv` 是带来源与日期的价目，`cost_model.py` 数 token 并出三档表；换价或换场景后重跑即可。
 
 评测集是本仓库最贵的资产：改动评测口径要先改这里，再改代码。

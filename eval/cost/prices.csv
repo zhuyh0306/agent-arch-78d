@@ -1,0 +1,5 @@
+model,tariff,hit_usd,miss_usd,out_usd,source,checked_at
+deepseek-flash,offpeak,0.003,0.15,0.6,https://api-docs.deepseek.com/quick_start/pricing,2026-11-10
+deepseek-flash,peak,0.006,0.3,1.2,https://api-docs.deepseek.com/quick_start/pricing,2026-11-10
+deepseek-v4-pro,offpeak,0.022,0.66,1.98,https://api-docs.deepseek.com/quick_start/pricing,2026-11-10
+deepseek-v4-pro,peak,0.044,1.32,3.96,https://api-docs.deepseek.com/quick_start/pricing,2026-11-10

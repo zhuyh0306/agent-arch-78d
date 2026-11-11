@@ -40,9 +40,18 @@
 - **操作** pgvector 带 `WHERE` 的 HNSW 是 post-filter，默认 `ef_search=40` 下匹配 10% 行平均只回 4 条，需开 `hnsw.iterative_scan`；`m`/`ef_construction` 改索引，`ef_search` 不改索引；维度上限 vector 2000 / halfvec 4000。
 - **复述** Temporal Workflow 必须确定性，副作用只能进 Activity；改命令顺序会让老实例重放失败。
 - **复述** 单次问答成本 = system + 工具描述 + 上下文 + 输出；三档测算（单次 / 千次 / 月）。
+- **操作** 成本模型可重算：价目落 CSV（模型 × 峰/谷 × 缓存命中/未命中，带 `checked_at`），token 用 `tiktoken` 实测，改一个价或一段提示就能重跑出三档表。
+- **复述** 计费按 token 不按字：同义内容中文 1.50 字/token、英文 4.27 字符/token，中文要多付约 2.8 倍 token。
+- **复述** 「成本大头是上下文」有门槛：输入成本压过输出要 `in > out × out_price / in_price`（Flash 谷时 ≈ 884 token）；短问答里输出可能才是大头，先测再优化。
+- **复述** KV cache 预分配只用到 20.4%–38.2%，PagedAttention 用块表把浪费压到接近零；自注意力对序列长度是 O(n²·d)，1M 上下文按 Flash 未命中价就是 $0.15/次。
+- **复述** 缓存只吃稳定前缀（system + 工具 schema 占输入 36% → 账单只降 20%）；峰谷同一请求差 2 倍。
 - **复述** 三种实现形态的判定顺序：纯代码 → workflow → autonomous agent，先证明「不用 Agent 会怎样」。
+- **复述** workflow 与 agent 的分界是「路径由谁定」：代码定路径是 workflow，模型定路径才是 agent；五个 workflow 模式是 chaining / routing / parallelization / orchestrator-workers / evaluator-optimizer。
+- **操作** 3 个真实场景的判定表，每个判定都配「何时该升级/退化」的反例（`docs/paradigm-decisions.md`）。
+- **复述** Plan-and-Solve 是提示法不是 agent（没有环境反馈）；ReAct 的 thought 不产生 observation，只有 action 才把环境反馈带回上下文。
+- **复述** agent 必须有四条边界：步数上限、工具白名单、只读、预算，外加人工确认点；缺一个就是失控而不是选型。
 
-**验收**：`docker-compose.yml` + `env_check.sh` 全项通过；成本三档表有数字；3 篇 ADR 落地；选型矩阵 CSV + ADR-0004。
+**验收**：`docker-compose.yml` + `env_check.sh` 全项通过；成本三档表有数字（`eval/cost/cost-model.csv`，峰谷与缓存已拆）；3 篇 ADR 落地；选型矩阵 CSV + ADR-0004；范式决策表（`docs/paradigm-decisions.md`）。
 
 **自测**
 

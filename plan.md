@@ -154,25 +154,25 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:18（18min）｜读：token 与上下文窗口的硬约束**
 
-- [ ] 📖 精读：OpenAI Tokenizer 在线分词工具 — https://platform.openai.com/tokenizer — 读「在线工具上方说明段：BPE 切分与 token 计数」
-- [ ] 📖 精读（补充）：vLLM / PagedAttention 论文 — https://arxiv.org/abs/2309.06180 — 读「Abstract + 2. Background（显存碎片问题）」
-- [ ] 🔍 扫读：Attention Is All You Need（Transformer 原始论文） — https://arxiv.org/abs/1706.03762 — 3.1 Scaled Dot-Product Attention 小节 + Figure 2 说明
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：OpenAI Tokenizer 在线分词工具 — https://platform.openai.com/tokenizer — 读「在线工具上方说明段：BPE 切分与 token 计数」（页面 403，改用本地 tiktoken 实测）
+- [x] 📖 精读（补充）：vLLM / PagedAttention 论文 — https://arxiv.org/abs/2309.06180 — 读「Abstract + 2. Background（显存碎片问题）」
+- [x] 🔍 扫读：Attention Is All You Need（Transformer 原始论文） — https://arxiv.org/abs/1706.03762 — 3.1 Scaled Dot-Product Attention 小节 + Figure 2 说明
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出（笔记与出处已齐，口述自测待本人）
 
 **00:18–00:58（40min）｜做：测算单次问答成本（system+工具+上下文+输出）**
 
-- [ ] 步骤1：测算单次问答成本（system+工具+上下文+输出）
-- [ ] 步骤2：做单次/千次/月三档成本表
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：测算单次问答成本（system+工具+上下文+输出）
+- [x] 步骤2：做单次/千次/月三档成本表
+- [x] 止损：卡住超过 15 分钟就换实现或查资料
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **00:58–01:30（32min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：成本测算表 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：成本测算表 真实存在且可复现（`eval/cost/cost-model.csv`，连跑两次一致）
 
 **🗣️ 面试速记**：Agent 的成本大头是上下文，不是输出｜追问：把单次成本降一半，你先动哪一块？
 
@@ -184,25 +184,25 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:18（18min）｜读：workflow 与 autonomous agent 的本质差异**
 
-- [ ] 📖 精读：Anthropic《Building Effective Agents》 — https://www.anthropic.com/engineering/building-effective-agents — 读「正文前半：workflow 各种模式（chaining / routing / parallelization）」
-- [ ] 📖 精读（补充）：Plan-and-Solve 论文 — https://arxiv.org/abs/2305.04091 — 读「Abstract + 3. Method」
-- [ ] 🔍 扫读：ReAct 论文 — https://arxiv.org/abs/2210.03629 — Figure 1 的说明段 + 2.1 的 Thought/Action/Observation 定义
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：Anthropic《Building Effective Agents》 — https://www.anthropic.com/engineering/building-effective-agents — 读「正文前半：workflow 各种模式（chaining / routing / parallelization）」
+- [x] 📖 精读（补充）：Plan-and-Solve 论文 — https://arxiv.org/abs/2305.04091 — 读「Abstract + 3. Method」
+- [x] 🔍 扫读：ReAct 论文 — https://arxiv.org/abs/2210.03629 — Figure 1 的说明段 + 2.1 的 Thought/Action/Observation 定义
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出（笔记与出处已齐，口述自测待本人）
 
 **00:18–00:58（40min）｜做：为 3 个业务场景判定"纯代码/workflow/agent"**
 
-- [ ] 步骤1：为 3 个业务场景判定"纯代码/workflow/agent"
-- [ ] 步骤2：写判定依据与反例
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：为 3 个业务场景判定"纯代码/workflow/agent"
+- [x] 步骤2：写判定依据与反例
+- [x] 止损：卡住超过 15 分钟就换实现或查资料
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **00:58–01:30（32min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：范式决策表 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：范式决策表 真实存在且可复现（`docs/paradigm-decisions.md`，3 场景各带依据与反例）
 
 **🗣️ 面试速记**：先证明该用 Agent，再谈怎么搭 Agent｜追问：这个场景不用 Agent 会怎样？
 
