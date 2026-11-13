@@ -53,9 +53,11 @@ cp .env.example .env      # 首次；填好各项，尤其是 64 位 hex 的 LAN
 podman machine start      # VM 未运行时
 ./scripts/env_check.sh    # 起服务之前应当全红，用来确认脚本本身有效
 podman compose up -d      # 在 infra/ 下执行；首次会拉镜像，超过 15 分钟按止损规则处理
-./scripts/env_check.sh    # 期望全部通过
+./scripts/env_check.sh    # 期望全部通过（起栈约 30–40 秒后再跑，首跑红先等健康端点）
 ./scripts/smoke.sh        # completion + Langfuse trace
 ```
+
+Day 6 实测（镜像已在本机）：`up -d` 17.7 秒创建完成，约 30–35 秒后 10/10 全绿。首跑常见 Langfuse / LiteLLM 返回 `000`，那是启动时序不是故障；等 `/api/public/health` 与 `/health/liveliness` 都回 200 再复跑。
 
 打开 <http://localhost:3000>，用 `.env` 里的 `LANGFUSE_ADMIN_EMAIL` / `LANGFUSE_ADMIN_PASSWORD` 登录；trace 也可以在 `scripts/smoke.sh` 输出的链接直接打开。
 

@@ -50,8 +50,10 @@
 - **操作** 3 个真实场景的判定表，每个判定都配「何时该升级/退化」的反例（`docs/paradigm-decisions.md`）。
 - **复述** Plan-and-Solve 是提示法不是 agent（没有环境反馈）；ReAct 的 thought 不产生 observation，只有 action 才把环境反馈带回上下文。
 - **复述** agent 必须有四条边界：步数上限、工具白名单、只读、预算，外加人工确认点；缺一个就是失控而不是选型。
+- **操作** M0-1 验收：`env_check.sh` 10/10、`smoke.sh` 一条 completion + 一条 trace；基线数按环境 / 闭环 / 成本 / 资源四类记录且每项带口径（`docs/m0-1-acceptance.md`）。
+- **复述** 验收项必须是「第三人能重放的命令 + 原样输出」；起栈中的红灯不等于故障，先等健康端点再复跑。
 
-**验收**：`docker-compose.yml` + `env_check.sh` 全项通过；成本三档表有数字（`eval/cost/cost-model.csv`，峰谷与缓存已拆）；3 篇 ADR 落地；选型矩阵 CSV + ADR-0004；范式决策表（`docs/paradigm-decisions.md`）。
+**验收**：`docker-compose.yml` + `env_check.sh` 全项通过；成本三档表有数字（`eval/cost/cost-model.csv`，峰谷与缓存已拆）；3 篇 ADR 落地；选型矩阵 CSV + ADR-0004；范式决策表（`docs/paradigm-decisions.md`）；M0-1 验收记录（`docs/m0-1-acceptance.md`）。
 
 **自测**
 
