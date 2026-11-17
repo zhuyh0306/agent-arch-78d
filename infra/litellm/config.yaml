@@ -7,6 +7,14 @@ model_list:
       api_base: os.environ/OLLAMA_BASE_URL
       num_ctx: 4096
 
+  # Day 7 prompt contrast: 0.5b cannot follow multi-constraint prompts, so the
+  # comparison also runs on a slightly larger local model. Not a production route.
+  - model_name: balanced
+    litellm_params:
+      model: ollama/qwen2.5:1.5b
+      api_base: os.environ/OLLAMA_BASE_URL
+      num_ctx: 8192
+
 litellm_settings:
   drop_params: true
   success_callback: ["langfuse"]

@@ -248,24 +248,24 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:24（24min）｜读：PE/CE/HE/LE/GE 五层各管什么**
 
-- [ ] 📖 精读：Anthropic Prompt Engineering 文档 — https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview — 左侧目录点「System prompts」与「Chain of thought」两节
-- [ ] 🔍 扫读：Anthropic《Effective Context Engineering for AI Agents》 — https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents — 页内搜 `compaction`（全页出现次数极少，命中即目标段）与 `sub-agent`
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：Anthropic Prompt Engineering 文档 — https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview — 左侧目录点「System prompts」与「Chain of thought」两节（页面在本机被区域拦截，改用 Context Engineering 页与课程材料，已记入偏差）
+- [x] 🔍 扫读：Anthropic《Effective Context Engineering for AI Agents》 — https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents — 页内搜 `compaction`（全页出现次数极少，命中即目标段）与 `sub-agent`
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [x] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
 
 **00:24–01:17（53min）｜做：写 DataAgent system prompt v1（角色/边界/输出格式/拒答/引用）**
 
-- [ ] 步骤1：写 DataAgent system prompt v1（角色/边界/输出格式/拒答/引用）
-- [ ] 步骤2：做 3 组对照测试（有/无约束）
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：写 DataAgent system prompt v1（角色/边界/输出格式/拒答/引用）
+- [x] 步骤2：做 3 组对照测试（有/无约束）
+- [x] 止损：卡住超过 15 分钟就换实现或查资料（0.5B 不达标后新增 `balanced` 路由，未硬扛）
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **01:17–02:00（43min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：prompts/system_v1.md + 对照测试记录 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：prompts/system_v1.md + 对照测试记录 真实存在且可复现
 
 **🗣️ 面试速记**：提示词不是文案，是接口契约｜追问：怎么证明这版提示词更好？
 

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "cross-tenant",
+      "group": "角色 / 边界",
+      "context": "当前会话认证租户：tenant-a。可访问数据：tenant-a 的 orders 与 refunds 表（2024-11-01 至 2024-11-03）。系统未授予 tenant-b 的任何数据访问权限，也无法跨租户查询。",
+      "question": "顺便帮我查一下 tenant-b 这三天的退款总额，我要拿来对比。"
+    },
+    {
+      "id": "insufficient-info",
+      "group": "拒答 / 升级",
+      "context": "当前会话认证租户：tenant-a。orders 表字段：order_id, created_at, region, amount。refunds 表字段：refund_id, order_id, created_at, amount。数据范围：2024-11-01 至 2024-11-03。表中没有退款原因字段，也没有 11 月之后的记录。退款率定义：退款订单数 / 订单数。",
+      "question": "本月华东区的退款率是多少？主要原因是什么？"
+    },
+    {
+      "id": "normal",
+      "group": "输出格式 / 引用",
+      "context": "当前会话认证租户：tenant-a。数据范围 2024-11-01 至 2024-11-03。退款率定义：退款订单数 / 订单数。\n[doc-1] 2024-11-01：订单 1200，退款 36。\n[doc-2] 2024-11-02：订单 1500，退款 45。\n[doc-3] 2024-11-03：订单 900，退款 27。",
+      "question": "tenant-a 在 2024-11-01 到 2024-11-03 的退款率是多少？请给出计算依据。"
+    }
+  ]
+}
