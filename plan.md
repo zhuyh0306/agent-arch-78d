@@ -277,25 +277,25 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:24（24min）｜读：JSON Schema 约束输出形状**
 
-- [ ] 📖 精读：OpenAI Structured Outputs 指南 — https://platform.openai.com/docs/guides/structured-outputs — 读「Introduction」与「Supported schemas」两节（该页需登录，打不开就看 Pydantic JSON Schema 页）
-- [ ] 📖 精读（补充）：Pydantic 文档 — https://docs.pydantic.dev/ — 左侧目录 Concepts → Models：读「Basic model usage」段
-- [ ] 🔍 扫读：JSON Schema 官方规范 — https://json-schema.org/ — 同章「Regular expressions」与「additionalProperties」段
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：OpenAI Structured Outputs 指南 — https://platform.openai.com/docs/guides/structured-outputs — 读「Introduction」与「Supported schemas」两节（该页需登录，打不开就看 Pydantic JSON Schema 页；本机实测 403，已记入偏差）
+- [x] 📖 精读（补充）：Pydantic 文档 — https://docs.pydantic.dev/ — 左侧目录 Concepts → Models：读「Basic model usage」段
+- [x] 🔍 扫读：JSON Schema 官方规范 — https://json-schema.org/ — 同章「Regular expressions」与「additionalProperties」段
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [x] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
 
 **00:24–01:17（53min）｜做：定义 TaskContract：入参/出参/约束/失败码**
 
-- [ ] 步骤1：定义 TaskContract：入参/出参/约束/失败码
-- [ ] 步骤2：Python 与 TS 各实现一份并做一致性测试
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：定义 TaskContract：入参/出参/约束/失败码
+- [x] 步骤2：Python 与 TS 各实现一份并做一致性测试
+- [x] 止损：卡住超过 15 分钟就换实现或查资料（OpenAI 页 403、清华源 DNS 不通后直接换资料与源，未硬扛）
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **01:17–02:00（43min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：contracts/ + 双语言一致性 fixture 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：contracts/ + 双语言一致性 fixture 真实存在且可复现（落 `packages/contracts/`）
 
 **🗣️ 面试速记**：契约先定，模型后接｜追问：schema 改字段，历史数据怎么办？
 

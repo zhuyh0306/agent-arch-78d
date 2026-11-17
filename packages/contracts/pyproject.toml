@@ -1,0 +1,13 @@
+[project]
+name = "dataagent-contracts"
+version = "0.1.0"
+description = "TaskContract schemas shared by the Python API and the TypeScript clients."
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2,<3"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["python"]
+testpaths = ["python"]

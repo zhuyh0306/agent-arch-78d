@@ -1,0 +1,11 @@
+{
+  "name": "@dataagent/contracts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cases": "node ts/run_cases.ts"
+  },
+  "dependencies": {
+    "zod": "3.23.8"
+  }
+}

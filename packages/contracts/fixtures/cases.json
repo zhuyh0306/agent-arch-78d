@@ -1,0 +1,29 @@
+{
+  "max_results": 5,
+  "cases": [
+    {
+      "id": "valid",
+      "group": "合法",
+      "raw": "{\"answer\":\"退款率为 3.00%。\",\"citations\":[{\"doc_id\":\"doc-1\",\"snippet\":\"2024-11-01：订单 1200，退款 36。\"}],\"confidence\":\"high\"}",
+      "expect": "PASS"
+    },
+    {
+      "id": "missing-field",
+      "group": "缺字段",
+      "raw": "{\"citations\":[],\"confidence\":\"high\"}",
+      "expect": "MISSING_FIELD"
+    },
+    {
+      "id": "enum-out-of-range",
+      "group": "枚举越界",
+      "raw": "{\"answer\":\"退款率为 3.00%。\",\"citations\":[],\"confidence\":\"very_high\"}",
+      "expect": "ENUM_OUT_OF_RANGE"
+    },
+    {
+      "id": "parse-error",
+      "group": "格式错乱",
+      "raw": "结论：退款率为 3.00%",
+      "expect": "PARSE_ERROR"
+    }
+  ]
+}
