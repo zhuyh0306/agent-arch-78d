@@ -76,10 +76,10 @@
 - **复述** 四层职责：Gateway（接入网关：认证、租户、限流、路由）/ Runtime（编排与恢复）/ Harness（循环、工具调用、终止条件）/ 治理层（权限、审计、评测）；能说清接入网关与模型网关 LiteLLM 为什么必须分开，以及各层的故障域。
 - **复述** 控制面与数据面的分界，以及 4 个人工审核点：H1 发布 / H2 高后果动作 / H3 校验失败转人工 / H4 抽样审计；每个点位要有触发条件、审批人视图、真拒绝权与超时默认动作，能说出为什么「全部审批」会变成 human-in-the-loop theater。
 - **复述** 模型答错时用户看到什么：结论 + 依据 + 下一步；内部保留原始产出 + 失败码 + 重试 + 成本，不用错误码或堆栈直接面对用户。
-- **复述** 多租户隔离三级：独立库 / 独立 schema / 行级策略（RLS）；`tenant_id` 要贯穿 请求 → DB → 向量库 → 日志 → 记忆。
+- **复述** 多租户隔离三级：独立库 / 独立 schema / 行级策略（RLS）；`tenant_id` 要贯穿 请求 → DB → 向量库 → 日志 → 记忆。能说出 RLS 的三个绕过点（表 owner、超级用户、`BYPASSRLS`）以及 `FORCE ROW LEVEL SECURITY`、restrictive 策略、`USING` vs `WITH CHECK` 的作用。
 - **识别** 零信任的三个组件：Policy Engine / Policy Administrator / Policy Enforcement Point。
 
-**验收**：`architecture.md` 含职责边界表；多租户文档 + 5 条越权用例；风险登记册 v1；`prompts/system_v1.md` + 3 组对照记录（含未达标项）；`ai-native-product.md` 含控制面 / 数据面图、4 个 HITL 点位与异常路径文案。
+**验收**：`architecture.md` 含职责边界表；多租户文档 + 5 条越权用例（含真实 RLS 最小复测）；风险登记册 v2；`prompts/system_v1.md` + 3 组对照记录（含未达标项）；`ai-native-product.md` 含控制面 / 数据面图、4 个 HITL 点位与异常路径文案；`week-02-review.md` 含架构自评与阻塞项修复记录。
 
 **自测**
 

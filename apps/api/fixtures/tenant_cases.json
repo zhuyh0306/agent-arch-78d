@@ -1,0 +1,53 @@
+{
+  "cases": [
+    {
+      "id": "db-cross-read",
+      "attack": "tenant-a 直接查询 tenant-b 的 orders",
+      "hop": "db",
+      "auth_tenant": "tenant-a",
+      "target_tenant": "tenant-b",
+      "expect": "DENY:TENANT_MISMATCH"
+    },
+    {
+      "id": "request-forged-tenant",
+      "attack": "请求体里把 tenant 改成 tenant-b，绕过 token",
+      "hop": "request",
+      "auth_tenant": "tenant-a",
+      "target_tenant": "tenant-b",
+      "expect": "DENY:TENANT_MISMATCH"
+    },
+    {
+      "id": "vector-filter-dropped",
+      "attack": "向量检索不注入 tenant_id 过滤条件",
+      "hop": "vector",
+      "auth_tenant": "tenant-a",
+      "target_tenant": "tenant-a",
+      "tenant_in_filter": false,
+      "expect": "DENY:FILTER_MISSING"
+    },
+    {
+      "id": "memory-cross-write",
+      "attack": "把记忆写到另一个租户的分区",
+      "hop": "memory",
+      "auth_tenant": "tenant-a",
+      "target_tenant": "tenant-b",
+      "expect": "DENY:TENANT_MISMATCH"
+    },
+    {
+      "id": "log-cross-query",
+      "attack": "按 tenant-b 查询日志 / Trace",
+      "hop": "log",
+      "auth_tenant": "tenant-a",
+      "target_tenant": "tenant-b",
+      "expect": "DENY:TENANT_MISMATCH"
+    },
+    {
+      "id": "db-own-read",
+      "attack": "对照组：tenant-a 读自己的数据",
+      "hop": "db",
+      "auth_tenant": "tenant-a",
+      "target_tenant": "tenant-a",
+      "expect": "ALLOW"
+    }
+  ]
+}
