@@ -307,24 +307,24 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:18（18min）｜读：控制面与数据面的分层**
 
-- [ ] 📖 精读：Anthropic《Building Effective Agents》 — https://www.anthropic.com/engineering/building-effective-agents — 读「正文前半：workflow 各种模式（chaining / routing / parallelization）」
-- [ ] 🔍 扫读：ThoughtWorks 技术雷达 — https://www.thoughtworks.com/radar — 四环说明：Adopt / Trial / Assess / Hold 各一句话
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：Anthropic《Building Effective Agents》 — https://www.anthropic.com/engineering/building-effective-agents — 读「正文前半：workflow 各种模式（chaining / routing / parallelization）」
+- [x] 🔍 扫读：ThoughtWorks 技术雷达 — https://www.thoughtworks.com/radar — 四环说明：Adopt / Trial / Assess / Hold 各一句话（本期实际第四环是 Caution，已按原文记录）
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [x] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
 
 **00:18–00:58（40min）｜做：画控制面/数据面分层图，标注 4 个人审点**
 
-- [ ] 步骤1：画控制面/数据面分层图，标注 4 个人审点
-- [ ] 步骤2：列 Demo 到产品的 5 个必补项
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：画控制面/数据面分层图，标注 4 个人审点
+- [x] 步骤2：列 Demo 到产品的 5 个必补项
+- [x] 止损：卡住超过 15 分钟就换实现或查资料（单图布局失败后拆成两张，未硬调坐标）
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **00:58–01:30（32min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：架构分层图 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：架构分层图 真实存在且可复现（两张 Mermaid 从文档本体渲染通过）
 
 **🗣️ 面试速记**：AI 产品的能力上限由异常路径决定｜追问：模型答错时用户看到什么？
 
@@ -336,24 +336,24 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:24（24min）｜读：Gateway / Runtime / Harness / 治理层四层职责**
 
-- [ ] 📖 精读：Anthropic《Building Effective Agents》 — https://www.anthropic.com/engineering/building-effective-agents — 读「正文前半：workflow 各种模式（chaining / routing / parallelization）」
-- [ ] 🔍 扫读：Anthropic《Effective Context Engineering for AI Agents》 — https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents — 页内搜 `compaction`（全页出现次数极少，命中即目标段）与 `sub-agent`
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：菜鸟教程《AI Workflow》 — https://m.runoob.com/ai-agent/ai-workflow.html — 读「模式一：顺序链」「模式二：条件路由」「模式三：并行执行」三节
+- [x] 🔍 扫读：菜鸟教程《Agent 上下文工程》 — https://m.runoob.com/ai-agent/agent-context-engineering.html — 读「历史记录的压缩策略」「渐进式披露」「上下文压缩链」三节
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [x] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
 
 **00:24–01:17（53min）｜做：画目标架构图（多租户+网关+运行时+工具+记忆+评测+可观测）**
 
-- [ ] 步骤1：画目标架构图（多租户+网关+运行时+工具+记忆+评测+可观测）
-- [ ] 步骤2：写四层职责边界表
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：画目标架构图（多租户+网关+运行时+工具+记忆+评测+可观测）
+- [x] 步骤2：写四层职责边界表
+- [x] 止损：卡住超过 15 分钟就换实现或查资料（单图布局成蜘蛛网后拆成两张，未硬调坐标）
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **01:17–02:00（43min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：architecture.md 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：architecture.md 真实存在且可复现（两张 Mermaid 从文档本体渲染通过）
 
 **🗣️ 面试速记**：分层不是为了好看，是为了让故障域可隔离｜追问：哪一层挂了系统还能用？
 
