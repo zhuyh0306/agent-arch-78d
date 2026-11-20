@@ -59,9 +59,9 @@
 
 | 检查 | 命令 | 结果 |
 |---|---|---|
-| 服务真的能起 | `uvicorn "dataagent.api.app:build_app" --factory --port 8123` | 进程启动，无报错 |
-| healthz | `curl localhost:8123/healthz` | **HTTP 200**，`{"status":"ok","dependencies":{"metrics_dictionary":{"state":"ok","critical":true},"llm":{"state":"ok","critical":true},"tools":{"state":"ok","critical":false}}}` |
-| 全链路打通 | `curl -H "X-API-Key: …" localhost:8123/metrics/gmv` | **HTTP 200**，返回 GMV 定义 + `source` + `[echo]` 回答 + `model: echo-0` |
+| 服务真的能起 | `uvicorn "dataagent.api.app:build_app" --factory --port 8130` | 进程启动，无报错 |
+| healthz | `curl localhost:8130/healthz` | **HTTP 200**，`{"status":"ok","dependencies":{"metrics_dictionary":{"state":"ok","critical":true},"llm":{"state":"ok","critical":true},"tools":{"state":"ok","critical":false}}}` |
+| 全链路打通 | `curl -H "X-API-Key: …" localhost:8130/metrics/gmv` | **HTTP 200**，返回 GMV 定义 + `source` + `[echo]` 回答 + `model: echo-0` |
 | 未知指标 | 同上，路径换 `not_a_metric` | **HTTP 422**，`{"failure_code":"METRIC_NOT_IN_DICTIONARY"}`（复用 Day 14 码） |
 | 门禁全量 | `./check.sh` | ruff + mypy(28 files) + `48 passed` |
 | 布局守卫 | `bash infra/scripts/check_layout.sh` | `layout ok` |
@@ -145,7 +145,7 @@
 
 ## 验收
 
-- [x] api 能启动（uvicorn 实测端口 8123）
+- [x] api 能启动（uvicorn 实测，端口 8130）
 - [x] healthz 返回 200 且带逐依赖状态
 - [x] 分层目录 `api / domain / agent / tools / infra` 存在且被守卫覆盖
 - [x] 3 个端口（LLM / Tool / Repo）有抽象与实现

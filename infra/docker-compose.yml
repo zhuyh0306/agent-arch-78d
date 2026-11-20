@@ -82,7 +82,12 @@ services:
       CLICKHOUSE_PASSWORD: clickhouse
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
     ports:
-      - "8123:8123"
+      # Host side moved to 18123: 127.0.0.1:8123 is taken by an unrelated
+      # process on this machine, which made the health check report a false
+      # failure while ClickHouse itself was fine. Container-internal traffic
+      # still uses 8123 (CLICKHOUSE_URL: http://clickhouse:8123), which is why
+      # only the left-hand side changes.
+      - "18123:8123"
     volumes:
       - clickhouse_data:/var/lib/clickhouse
     healthcheck:

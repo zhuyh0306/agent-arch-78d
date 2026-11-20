@@ -14,7 +14,7 @@ Day 1 的验收物就在这里：`docker-compose.yml` + `scripts/env_check.sh`�
 | postgres | `postgres:16-alpine` | 5432 | Langfuse 元数据 |
 | redis | `redis:7-alpine` | 6379 | Langfuse 队列/缓存 |
 | qdrant | `qdrant/qdrant:v1.12.4` | 6333/6334 | 向量库 |
-| clickhouse | `clickhouse/clickhouse-server:24.3-alpine` | 8123 | Langfuse 事件存储（v3 必需） |
+| clickhouse | `clickhouse/clickhouse-server:24.3-alpine` | 18123 | Langfuse 事件存储（v3 必需） |
 | minio | `cgr.dev/chainguard/minio:latest` | 19000/19001 | Langfuse 事件对象存储（v3 必需） |
 | langfuse-web | `langfuse/langfuse:3` | 3000 | 控制台与查询 API |
 | langfuse-worker | `langfuse/langfuse-worker:3` | — | 异步消费事件 |

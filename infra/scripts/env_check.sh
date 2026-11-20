@@ -91,7 +91,7 @@ check_tcp "minio" 127.0.0.1 19000
 echo
 echo "http health"
 check_http "qdrant" http://127.0.0.1:6333/healthz
-check_http "clickhouse" http://127.0.0.1:8123/ping
+check_http "clickhouse" http://127.0.0.1:18123/ping
 check_http "minio" http://127.0.0.1:19000/minio/health/live
 check_http "langfuse" http://127.0.0.1:3000/api/public/health
 check_http "litellm" http://127.0.0.1:4000/health/liveliness

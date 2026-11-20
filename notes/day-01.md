@@ -53,7 +53,8 @@
 ## 已知限制
 
 - 本机 9000/9001 被一个 ssh 端口转发占着，MinIO 映射到 `19000/19001`；compose 内各服务仍走容器名 + 9000，不受影响。
-- 模型用本机 Ollama（`qwen2.5:0.5b`）代替云厂商 key，链路一致、成本为 0；换云模型只需改 `model_list` 里的 `model` 与对应 API key。
+- **补记（Day 20 复核）**：本机 `127.0.0.1:8123` 被一个非本项目进程占用（`ps` 在本会话不可见，来源不明），ClickHouse 宿主机端口已从 `8123` 改为 `18123`，`env_check.sh` 与 `infra/README.md` 同步更新。容器间仍走 `clickhouse:8123`，未受影响。改后 `env_check.sh` 恢复 `10 checks passed`。
+- 模型用本机 Ollama（`qwen2.5:0.5b`）代替云厂商 key，链路一致、成本为 0；换云模型只需改 `model_list` 里的 `model` 与对应 API key。该模型对专业概念会答错（实测把「动销率」说成毛利率），仅用于验证链路，不可作为正确性依据。
 - colima VM 只有约 5.7 GiB，叠在其他项目容器之上，所以给每个服务都写了 mem_limit；同时跑更多实验前要先 `docker stats`。
 
 ## 验收

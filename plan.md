@@ -95,16 +95,16 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:18（18min）｜读：monorepo 分层：apps / packages / skills / eval / infra**
 
-- [ ] 📖 精读：ADR 架构决策记录官网 — https://adr.github.io/ — 读「What is an ADR 与 Structure of an ADR」
-- [ ] 🔍 扫读：Martin Fowler：依赖倒置实践 — https://martinfowler.com/articles/dipInTheWild.html — 文章内搜 `InversionOfControl`（代码示例段，全页仅数处）
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：ADR 架构决策记录官网 — https://adr.github.io/ — 读「What is an ADR 与 Structure of an ADR」
+- [x] 🔍 扫读：Martin Fowler：依赖倒置实践 — https://martinfowler.com/articles/dipInTheWild.html — 文章内搜 `InversionOfControl`（代码示例段，全页仅数处）
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [x] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
 
 **00:18–00:58（40min）｜做：初始化仓库骨架与目录规范**
 
 - [x] 步骤1：初始化仓库骨架与目录规范
 - [x] 步骤2：写 3 篇 ADR：语言栈、目录结构、模型网关选型
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
+- [x] 止损：卡住超过 15 分钟就换实现或查资料
 - [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **00:58–01:30（32min）｜收：归档与自检**
