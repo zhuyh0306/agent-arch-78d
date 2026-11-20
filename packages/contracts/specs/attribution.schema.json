@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataagent.local/specs/attribution.schema.json",
+  "title": "AttributionContract v1",
+  "description": "归因类任务：指标变化由哪几项贡献。分子项之和必须闭合到总变化，否则不是归因是猜测。",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "const": "1"
+    },
+    "task_type": {
+      "const": "attribution"
+    },
+    "metric": {
+      "$ref": "common.schema.json#/$defs/MetricId"
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16,
+      "description": "与指标字典的 unit 一致"
+    },
+    "window": {
+      "$ref": "common.schema.json#/$defs/TimeWindow"
+    },
+    "baseline_window": {
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/TimeWindow"
+        }
+      ],
+      "description": "对比基期。归因必须说清「和什么时候比」，缺基期的变化率没有意义"
+    },
+    "total_change": {
+      "type": "number",
+      "description": "指标在 window 相对 baseline_window 的总变化，绝对值口径（不是百分比）"
+    },
+    "contributors": {
+      "type": "array",
+      "description": "贡献项，按 |contribution| 从大到小排序，最多 8 项；剩余不显著项并入 'other'",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "按哪个维度拆：channel / province / category / hour ..."
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "维度取值"
+          },
+          "contribution": {
+            "type": "number",
+            "description": "对 total_change 的贡献，带正负号"
+          },
+          "share": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "contribution / total_change；total_change 为 0 时必须 null"
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items": {
+              "$ref": "common.schema.json#/$defs/Evidence"
+            }
+          }
+        },
+        "required": [
+          "dimension",
+          "value",
+          "contribution",
+          "share",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "residual": {
+      "type": "number",
+      "description": "total_change 减去全部 contribution 的剩余量。非 0 超过容差就是没归因干净"
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "additive_decomposition",
+        "log_decomposition",
+        "shapley"
+      ],
+      "description": "方法必须显式声明，因为不同方法算出的贡献不可直接比较"
+    },
+    "verdict": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "$ref": "common.schema.json#/$defs/Evidence"
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "closure_tolerance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "|residual| 允许的最大绝对值，超出即 CONSTRAINT_VIOLATION"
+        },
+        "max_contributors": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "contribution_sorted_desc": {
+          "const": true,
+          "description": "必须按 |contribution| 降序，防止把大项藏在末尾"
+        }
+      },
+      "required": [
+        "closure_tolerance",
+        "max_contributors",
+        "contribution_sorted_desc"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract_version",
+    "task_type",
+    "metric",
+    "unit",
+    "window",
+    "baseline_window",
+    "total_change",
+    "contributors",
+    "residual",
+    "method",
+    "verdict",
+    "evidence",
+    "constraints"
+  ],
+  "additionalProperties": false,
+  "$comment": "残差闭合（|residual| <= closure_tolerance）、排序、share 的一致性由 contract_rules.py 校验；JSON Schema 只看形状与取值域。"
+}

@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataagent.local/specs/compare.schema.json",
+  "title": "CompareContract v1",
+  "description": "对比类任务：A 与 B 在两个维度上比，给出差值与方向。只回答「差多少」，不回答「为什么」——那是归因类的事。",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "const": "1"
+    },
+    "task_type": {
+      "const": "compare"
+    },
+    "metric": {
+      "$ref": "common.schema.json#/$defs/MetricId"
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16,
+      "description": "输出单位，必须与指标字典里的 unit 一致，不能自造 '万元' 之类换算单位"
+    },
+    "window": {
+      "$ref": "common.schema.json#/$defs/TimeWindow"
+    },
+    "left": {
+      "type": "object",
+      "description": "被比的一方 A",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "value": {
+          "type": "number"
+        },
+        "dimensions": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "$ref": "common.schema.json#/$defs/Dimension"
+          }
+        }
+      },
+      "required": [
+        "label",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "right": {
+      "type": "object",
+      "description": "被比的一方 B，形状与 left 相同",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "value": {
+          "type": "number"
+        },
+        "dimensions": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "$ref": "common.schema.json#/$defs/Dimension"
+          }
+        }
+      },
+      "required": [
+        "label",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "delta": {
+      "type": "object",
+      "description": "差值。absolute 与 relative 必须都算，只给一个就不算对比",
+      "properties": {
+        "absolute": {
+          "type": "number",
+          "description": "left.value - right.value"
+        },
+        "relative": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "absolute / right.value；基期为 0 时必须为 null，不能写 0 或 Infinity"
+        }
+      },
+      "required": [
+        "absolute",
+        "relative"
+      ],
+      "additionalProperties": false
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "up",
+        "down",
+        "flat"
+      ],
+      "description": "left 相对 right 的方向；绝对值小于容差时为 flat"
+    },
+    "verdict": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300,
+      "description": "先结论后依据，最多两句话"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "$ref": "common.schema.json#/$defs/Evidence"
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "description": "程序化约束，不在提示词里保证",
+      "properties": {
+        "left_right_not_equal": {
+          "const": true,
+          "description": "A 与 B 的 label 不能相同，相同就是自比，差值恒为 0 无意义"
+        },
+        "max_dimensions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "单侧维度上限，避免把对比做成切片罗列"
+        }
+      },
+      "required": [
+        "left_right_not_equal",
+        "max_dimensions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract_version",
+    "task_type",
+    "metric",
+    "unit",
+    "window",
+    "left",
+    "right",
+    "delta",
+    "direction",
+    "verdict",
+    "evidence",
+    "constraints"
+  ],
+  "additionalProperties": false,
+  "$comment": "left.label 与 right.label 必须不同、delta 必须等于 left.value-right.value、relative 必须等于 absolute/right.value——这三条是跨字段关系，JSON Schema 表达不了（它没有引用其他属性值的动词），由 contract_rules.py 的 check_cross_field() 校验。禁止在前端或 SQL 里再算一遍。"
+}

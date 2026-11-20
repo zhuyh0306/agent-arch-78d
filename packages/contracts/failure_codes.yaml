@@ -1,0 +1,143 @@
+version: 1
+updated_at: "2026-11-20"
+owner: 本人
+description: >
+  DataAgent 的失败码表，回答「什么算这个任务失败了」。码是稳定枚举，只增不改；
+  新增码要同时改本文件、specs/common.schema.json 的 FailureCodeName，以及 contracts/README 的规则段。
+  实际校验以 specs/common.schema.json 为准，本文件是给人读的口径表（列出「客户拿到会怎么理解」与处理动作）。
+  当前状态：码表已定，但没有任何代码在返回这些码——契约层只定义「什么算失败」，
+  真正产出码的校验入口（parse → schema → rules）与重试循环分别属 Api 层与 Loop 层，尚未实现。
+
+axes:
+  - id: shape
+    question: 产出符不符合契约形状？
+    who_fixes: 模型 / 提示词 / 校验层
+  - id: semantic
+    question: 形状对了，但口径、来源、时窗对不对？
+    who_fixes: 工具 / 数据层
+  - id: control
+    question: 该不该给这个答案？
+    who_fixes: 策略层 / 人
+
+codes:
+  - code: PARSE_ERROR
+    axis: shape
+    severity: recoverable
+    http: 422
+    when: 模型输出不是合法 JSON
+    action: 重试一次；连续两次即 RETRY_EXHAUSTED
+  - code: MISSING_FIELD
+    axis: shape
+    severity: recoverable
+    http: 422
+    when: 契约 required 字段缺失
+    action: 把缺失字段名回填进重试提示
+  - code: UNKNOWN_FIELD
+    axis: shape
+    severity: recoverable
+    http: 422
+    when: 出现契约未声明的字段（schema 为 additionalProperties=false）
+    action: 拒绝多余字段，不静默丢弃（ADR-0005 决策 2）
+  - code: TYPE_ERROR
+    axis: shape
+    severity: recoverable
+    http: 422
+    when: 字段类型不符，且不属于更具体的枚举 / 约束错误
+    action: 同 PARSE_ERROR
+  - code: ENUM_OUT_OF_RANGE
+    axis: shape
+    severity: recoverable
+    http: 422
+    when: 枚举取值不在允许集合内（如 direction=sideways）
+    action: 重试时把合法取值列表完整贴回去
+  - code: CONSTRAINT_VIOLATION
+    axis: shape
+    severity: recoverable
+    http: 422
+    when: 通过 schema 但违反跨字段规则（残差未闭合、low>high、delta 与左右值不符等）
+    action: 把 contract_rules 的具体违规项回填重试；不得直接放行
+  - code: WINDOW_INVALID
+    axis: semantic
+    severity: terminal
+    http: 400
+    when: 时窗起止颠倒、为空、或早于数据可用期
+    action: 不重试，要求用户改时窗；时窗错重试多少次都不会对
+  - code: WINDOW_TOO_LONG
+    axis: semantic
+    severity: terminal
+    http: 400
+    when: 请求跨度超过契约上限（如预测 horizon 超过 max_horizon_periods）
+    action: 建议收窄时窗，并写明上限
+  - code: METRIC_NOT_IN_DICTIONARY
+    axis: semantic
+    severity: terminal
+    http: 422
+    when: 指标名不在 metrics_dictionary.yaml 中，或口径只有模型自己知道
+    action: 终止并提示可用指标；绝不用别的指标顶替
+  - code: DIMENSION_NOT_IN_DICTIONARY
+    axis: semantic
+    severity: terminal
+    http: 422
+    when: 拆分维度（channel / province ...）不存在或未对齐字典
+    action: 列出可用维度
+  - code: SOURCE_UNAVAILABLE
+    axis: semantic
+    severity: recoverable
+    http: 503
+    when: 数据源 / 工具不可达或超时
+    action: 有界重试 + 退避；仍失败转 INSUFFICIENT_DATA，不允许编数
+  - code: SUBTASK_TIMEOUT
+    axis: control
+    severity: recoverable
+    http: 504
+    when: 子任务（多步编排里的单步）超时
+    action: 降级为该步缺失并标注，或整体终止，由调用方按 criticality 决定
+  - code: LABEL_INSUFFICIENT
+    axis: semantic
+    severity: recoverable
+    http: 422
+    when: 缺少判定所需的标签 / 分类信息（如对比项 B 的归属未知）
+    action: 先补标签再答，不允许猜归属
+  - code: THRESHOLD_UNJUSTIFIED
+    axis: semantic
+    severity: terminal
+    http: 422
+    when: 阈值、判定线没有来自基线或字典的出处（异常检测里最常见的编造点）
+    action: 终止；要求给出阈值推导来源
+  - code: BASELINE_MISSING
+    axis: semantic
+    severity: terminal
+    http: 422
+    when: 归因 / 异常任务缺少基期数据或基线样本不足
+    action: 明确告知需要多长的基期
+  - code: DATA_NOT_CACHED
+    axis: control
+    severity: terminal
+    http: 425
+    when: 请求的时间粒度或范围需要预聚合，但缓存未就绪
+    action: 返回可用缓存清单，不现场扫全表
+  - code: GUARDRAIL_BLOCKED
+    axis: control
+    severity: terminal
+    http: 403
+    when: 命中护栏（跨租户取数、越权维度、PII）
+    action: 终止并审计；不得以「换个说法再试」绕过
+  - code: INSUFFICIENT_DATA
+    axis: semantic
+    severity: terminal
+    http: 200
+    when: 数据不足以支撑结论（点数不够、分母为 0、覆盖不全）
+    action: 返回 conclusion=insufficient_data，answer 里说明缺什么；这是合法结果不是错误
+  - code: RETRY_EXHAUSTED
+    axis: control
+    severity: terminal
+    http: 502
+    when: 重试次数用尽仍未产出合法输出
+    action: 降级到兜底回答并标记 degraded=true；由 Day 5 循环层负责，不在校验器里抛
+
+sync_rule:
+  machine_truth: specs/common.schema.json#/$defs/FailureCodeName.enum
+  contract_subset_field: specs/*.schema.json -> failure_codes
+  note: >
+    codes[].code 与 FailureCodeName.enum 逐项相等；每份契约的 failure_codes 必须是全表的真子集，
+    且 check_specs.py 会断言五份契约合起来覆盖全表——这样新码加进枚举后立刻会有契约认领。

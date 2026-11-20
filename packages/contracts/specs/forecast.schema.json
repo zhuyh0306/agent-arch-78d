@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataagent.local/specs/forecast.schema.json",
+  "title": "ForecastContract v1",
+  "description": "预测类任务：未来的值与不确定区间。点估计不带区间就不叫预测，叫许愿。",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "const": "1"
+    },
+    "task_type": {
+      "const": "forecast"
+    },
+    "metric": {
+      "$ref": "common.schema.json#/$defs/MetricId"
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16,
+      "description": "与指标字典的 unit 一致"
+    },
+    "history_window": {
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/TimeWindow"
+        }
+      ],
+      "description": "拟合所用的历史窗口，必须早于 horizon 起点"
+    },
+    "horizon": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date"
+        },
+        "end": {
+          "type": "string",
+          "format": "date"
+        },
+        "granularity": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month"
+          ]
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "granularity"
+      ],
+      "additionalProperties": false
+    },
+    "method": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "naive",
+            "moving_average",
+            "holt_winters",
+            "prophet",
+            "llm_assisted"
+          ]
+        },
+        "params": {
+          "type": "object",
+          "description": "方法参数原样记录，保证可复算",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "backtest": {
+      "type": "object",
+      "description": "回测结果。没有回测误差的区间宽度就是编的",
+      "properties": {
+        "holdout_periods": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        },
+        "mape": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "平均绝对百分比误差；真值含 0 时可为 null 并改用 mae"
+        },
+        "mae": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "holdout_periods",
+        "mape",
+        "mae"
+      ],
+      "additionalProperties": false
+    },
+    "points": {
+      "type": "array",
+      "description": "按时间升序的预测点，每点必须带区间",
+      "minItems": 1,
+      "maxItems": 60,
+      "items": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$"
+          },
+          "value": {
+            "type": "number"
+          },
+          "low": {
+            "type": "number",
+            "description": "区间下界，必须 <= value"
+          },
+          "high": {
+            "type": "number",
+            "description": "区间上界，必须 >= value"
+          }
+        },
+        "required": [
+          "period",
+          "value",
+          "low",
+          "high"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "interval_level": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1,
+      "description": "区间置信水平，如 0.8 / 0.95。必须显式给出，不能默认"
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "预测依赖的前提（无大促、供给稳定等）。没有 assumptions 的预测不可被审计",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "verdict": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "$ref": "common.schema.json#/$defs/Evidence"
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "max_horizon_periods": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60,
+          "description": "超过即 WINDOW_TOO_LONG，不允许预测一年只给三行"
+        },
+        "min_history_periods": {
+          "type": "integer",
+          "minimum": 14,
+          "description": "历史不足即 INSUFFICIENT_DATA"
+        },
+        "interval_required": {
+          "const": true
+        },
+        "backtest_required": {
+          "const": true
+        },
+        "max_backtest_mape": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "回测 MAPE 超过该值即拒绝出结论"
+        }
+      },
+      "required": [
+        "max_horizon_periods",
+        "min_history_periods",
+        "interval_required",
+        "backtest_required",
+        "max_backtest_mape"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract_version",
+    "task_type",
+    "metric",
+    "unit",
+    "history_window",
+    "horizon",
+    "method",
+    "backtest",
+    "points",
+    "interval_level",
+    "assumptions",
+    "verdict",
+    "evidence",
+    "constraints"
+  ],
+  "additionalProperties": false,
+  "$comment": "low <= value <= high、history_window.end 不晚于 horizon.start、MAPE 是否超过 max_backtest_mape、点数是否超过 max_horizon_periods，由 contract_rules.py 校验。JSON Schema 管不到跨对象的时间先后。"
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataagent.local/specs/common.schema.json",
+  "title": "Common definitions",
+  "description": "五类任务契约共用的形状。改动这里等于改动全部五份契约，必须先跑 check_specs.py。",
+  "$defs": {
+    "MetricId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,47}$",
+      "description": "必须来自 packages/contracts/metrics_dictionary.yaml 的 metrics[].id；不在字典里的指标名属于编造口径"
+    },
+    "TimeWindow": {
+      "type": "object",
+      "description": "分析时间窗口。两端都是自然日，左闭右开",
+      "properties": {
+        "start": { "type": "string", "format": "date", "description": "窗口起，含" },
+        "end": { "type": "string", "format": "date", "description": "窗口止，不含" },
+        "timezone": { "type": "string", "const": "Asia/Shanghai", "description": "与指标字典 conventions.timezone 一致" }
+      },
+      "required": ["start", "end", "timezone"],
+      "additionalProperties": false
+    },
+    "Dimension": {
+      "type": "object",
+      "properties": {
+        "field": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "value": { "type": "string", "minLength": 1, "maxLength": 128 }
+      },
+      "required": ["field", "value"],
+      "additionalProperties": false
+    },
+    "Evidence": {
+      "type": "object",
+      "description": "结论的唯一来源。没有 evidence 的结论就是编的",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "description": "表.字段 或 字典 id 或 工具名，必须能在 lineage 里回查"
+        },
+        "value": { "type": ["number", "string"], "description": "原始值，不做四舍五入" },
+        "unit": { "type": "string", "maxLength": 16 },
+        "detail": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["source"],
+      "additionalProperties": false
+    },
+    "FailureCodeName": {
+      "type": "string",
+      "enum": [
+        "PARSE_ERROR",
+        "MISSING_FIELD",
+        "UNKNOWN_FIELD",
+        "TYPE_ERROR",
+        "ENUM_OUT_OF_RANGE",
+        "CONSTRAINT_VIOLATION",
+        "WINDOW_INVALID",
+        "WINDOW_TOO_LONG",
+        "METRIC_NOT_IN_DICTIONARY",
+        "DIMENSION_NOT_IN_DICTIONARY",
+        "SOURCE_UNAVAILABLE",
+        "SUBTASK_TIMEOUT",
+        "LABEL_INSUFFICIENT",
+        "THRESHOLD_UNJUSTIFIED",
+        "BASELINE_MISSING",
+        "DATA_NOT_CACHED",
+        "GUARDRAIL_BLOCKED",
+        "INSUFFICIENT_DATA",
+        "RETRY_EXHAUSTED"
+      ],
+      "description": "与 failure_codes.yaml 的 codes[].code 逐项相等，由 check_specs.py 强制"
+    }
+  }
+}

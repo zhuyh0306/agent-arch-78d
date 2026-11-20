@@ -457,24 +457,24 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:24（24min）｜读：任务=输入+约束+验收标准**
 
-- [ ] 📖 精读：JSON Schema 官方规范 — https://json-schema.org/ — 左侧目录 Understanding JSON Schema → Object：读 properties、required 两段
-- [ ] 🔍 扫读：Anthropic《Building Effective Agents》 — https://www.anthropic.com/engineering/building-effective-agents — 读「Agents」章 + 「Combining and customizing these patterns」结尾段
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：JSON Schema 官方规范 — https://json-schema.org/ — 左侧目录 Understanding JSON Schema → Object：读 properties、required 两段
+- [x] 🔍 扫读：Anthropic《Building Effective Agents》 — https://www.anthropic.com/engineering/building-effective-agents — 读「Agents」章 + 「Combining and customizing these patterns」结尾段
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [x] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
 
 **00:24–01:17（53min）｜做：为对比/归因/趋势/异常/预测 5 类各写 1 份契约**
 
-- [ ] 步骤1：为对比/归因/趋势/异常/预测 5 类各写 1 份契约
-- [ ] 步骤2：建失败码表
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：为对比/归因/趋势/异常/预测 5 类各写 1 份契约
+- [x] 步骤2：建失败码表
+- [x] 止损：卡住超过 15 分钟就换实现或查资料
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **01:17–02:00（43min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：contracts/ 5 份 + 失败码表 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：contracts/ 5 份 + 失败码表 真实存在且可复现
 
 **🗣️ 面试速记**：没有契约的 Agent 无法评测｜追问：什么算"这个任务失败了"？
 
