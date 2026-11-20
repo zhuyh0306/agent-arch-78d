@@ -103,7 +103,11 @@ COMMIT;
 
 ## 7. 5 条越权用例
 
-用例落在 `apps/api/fixtures/tenant_cases.json`，由 `apps/api/tenant_policy.py` 执行。每条攻击都对应一个必须拒绝的跳。
+用例落在 `apps/api/fixtures/tenant_cases.json`，由 `apps/api/dataagent/domain/tenant_policy.py` 执行。每条攻击都对应一个必须拒绝的跳。
+
+Day 15 把策略模块从 `apps/api/tenant_policy.py` 移入 `dataagent/domain/`（ADR-0006）：它是纯业务策略，无框架无 I/O，属于 domain 层。fixture 仍留在 `apps/api/fixtures/`，因为那是测试数据不是代码。
+
+同时补上了此前缺失的**请求跳（request hop）**：Day 11 的五跳里，db / vector / log / memory 都有实现，唯独「请求进来时怎么拿到并验证 tenant」整份 78 天计划都没覆盖。现在由 `dataagent/domain/tenant.py` 的 `TenantContext` + `dataagent/api/deps.py` 的 `get_tenant_context` 承担，规则见第 9 节。
 
 | ID | 攻击 | 期望 | 防线 |
 |---|---|---|---|
@@ -119,11 +123,38 @@ COMMIT;
 
 ```bash
 cd apps/api
-/Users/zhuyonghui/miniconda3/envs/py311/bin/python -m pytest -q
-/Users/zhuyonghui/miniconda3/envs/py311/bin/python tenant_policy.py
+.venv/bin/python -m pytest -q          # 含 tenant_policy 与 tenant/auth 用例
+./check.sh                             # ruff + mypy + pytest 全量门禁
 ```
 
-当前结果：`5 passed`；模拟器输出 `5 attacks denied, 1 control allowed`。
+当前结果：`48 passed`。模拟器可用 `python -c "from dataagent.domain.tenant_policy import main; raise SystemExit(main())"` 单独跑。
+
+## 9. 请求跳落地（Day 15 补齐）
+
+**租户只能来自已认证的身份，不能来自请求。** 这是整个隔离体系的前提：如果调用方能自报 `tenant_id`，下游 RLS 再严密也没意义，因为边界在进数据库之前就已经被跨过了。
+
+| 规则 | 实现 | 反例 |
+|---|---|---|
+| key 与租户一对一绑定 | `ApiKeyStore.authenticate()` 只按 key 查表 | 用 A 的 key 带 `X-Tenant-Id: tenant-b` → 仍解析为 tenant-a |
+| 无 key 即拒绝 | 缺失凭据抛 `AuthenticationError` → 401 | — |
+| 未配置即全拒 | `DATAAGENT_API_KEYS` 为空 → 空 store → 全拒 | 不存在「开发默认租户」 |
+| 常量时间比较 | `hmac.compare_digest` | 防计时侧信道 |
+| 错误不泄漏细节 | 401 固定返回 `GUARDRAIL_BLOCKED`，不回显 key | 日志只记 path / method / 有无凭据 |
+| 租户格式受限 | `^[a-z0-9][a-z0-9-]{1,31}$` | 杜绝下游拼接 SQL / namespace 时的转义问题 |
+| 上下文不可变 | `@dataclass(frozen=True)` | 下游无法改写租户 |
+
+`/healthz` 有意免鉴权：负载均衡器没有 key，探针不可调用等于没有探针。其响应只含依赖名与状态，不含任何配置或租户信息。
+
+**已验证（真实进程，端口 8125/8126）**：
+
+| 请求 | 结果 |
+|---|---|
+| 无 key | `401 GUARDRAIL_BLOCKED` |
+| 错 key | `401 GUARDRAIL_BLOCKED` |
+| 正确 key A | `200`，`tenant_id=tenant-a` |
+| key A + `X-Tenant-Id: tenant-b` + `?tenant_id=tenant-b` | `200`，仍为 `tenant-a`（无法冒用） |
+| 未配置 `DATAAGENT_API_KEYS` + 任意 key | `401`（fail closed） |
+| `/healthz` 无 key | `200` |
 
 **真实 RLS 最小复测（Day 12，Postgres 16，临时库已删除）**：
 

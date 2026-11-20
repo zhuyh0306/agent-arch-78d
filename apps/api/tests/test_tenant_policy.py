@@ -1,4 +1,4 @@
-from tenant_policy import Reason, authorize_hop, load_cases
+from dataagent.domain.tenant_policy import Reason, authorize_hop, load_cases
 
 
 def test_fixture_cases_match_expectations():

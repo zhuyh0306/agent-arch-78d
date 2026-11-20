@@ -3,6 +3,10 @@
 This is a policy simulator, not the database enforcement itself. The RLS
 snippet lives in docs/multi-tenancy.md; this module makes the five attack
 cases executable before tenant tables exist.
+
+Moved into ``dataagent/domain`` on Day 15 (ADR-0006) because it is pure business
+policy: stdlib only, no framework, no I/O. The fixture stays outside the package
+because it is test data, not code.
 """
 
 from __future__ import annotations
@@ -71,7 +75,11 @@ def authorize_hop(
 
 
 def load_cases(path: Path | None = None) -> list[dict]:
-    fixture = path or Path(__file__).resolve().parent / "fixtures" / "tenant_cases.json"
+    if path is not None:
+        fixture = path
+    else:
+        # dataagent/domain/tenant_policy.py -> apps/api/fixtures/tenant_cases.json
+        fixture = Path(__file__).resolve().parents[2] / "fixtures" / "tenant_cases.json"
     return json.loads(fixture.read_text())["cases"]
 
 

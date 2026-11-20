@@ -486,24 +486,24 @@ uv export --format requirements-txt  # 导出为传统 requirements.txt，兼容
 
 **00:00–00:24（24min）｜读：分层：api / domain / agent / tools / infra**
 
-- [ ] 📖 精读：Martin Fowler：依赖倒置实践 — https://martinfowler.com/articles/dipInTheWild.html — 读「文章 Introduction 段」
-- [ ] 🔍 扫读：ADR 架构决策记录官网 — https://adr.github.io/ — 同页「ADR process」段，只看状态流转那几个词
-- [ ] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
-- [ ] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
+- [x] 📖 精读：Martin Fowler：依赖倒置实践 — https://martinfowler.com/articles/dipInTheWild.html — 读「文章 Introduction 段」
+- [x] 🔍 扫读：ADR 架构决策记录官网 — https://adr.github.io/ — 同页「ADR process」段，只看状态流转那几个词
+- [x] ✍️ 动作：精读记 3 条笔记 → 扫读写模块归属 → 合上资料口述一遍
+- [x] ✅ 验收：3 条笔记可复述 / 一句话说清项目落点 / 模块归属写得出
 
 **00:24–01:17（53min）｜做：搭 FastAPI 骨架 + 3 个端口空实现（LLM/Tool/Repo）**
 
-- [ ] 步骤1：搭 FastAPI 骨架 + 3 个端口空实现（LLM/Tool/Repo）
-- [ ] 步骤2：跑通 healthz
-- [ ] 止损：卡住超过 15 分钟就换实现或查资料
-- [ ] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
+- [x] 步骤1：搭 FastAPI 骨架 + 3 个端口空实现（LLM/Tool/Repo）
+- [x] 步骤2：跑通 healthz
+- [x] 止损：卡住超过 15 分钟就换实现或查资料
+- [x] ✅ 验收：有一个能当场演示的结果（跑一条命令 / 打开一个页面 / 看一条记录）
 
 **01:17–02:00（43min）｜收：归档与自检**
 
-- [ ] 产物入仓库目录，命名可检索
-- [ ] 写 3 行 notes：卡点 / 绕过 / 下次
-- [ ] 对照今日验收物逐条打勾，未完成项写补做日
-- [ ] ✅ 验收：可启动 api + healthz + 分层目录 真实存在且可复现
+- [x] 产物入仓库目录，命名可检索
+- [x] 写 3 行 notes：卡点 / 绕过 / 下次
+- [x] 对照今日验收物逐条打勾，未完成项写补做日
+- [x] ✅ 验收：可启动 api + healthz + 分层目录 真实存在且可复现
 
 **🗣️ 面试速记**：先在单体里把边界划清，再谈拆服务｜追问：什么时候该拆？
 
