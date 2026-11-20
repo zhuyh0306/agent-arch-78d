@@ -137,7 +137,9 @@ cd apps/api
 
 第一次只写了 restrictive 策略，`tenant-a` 读到 0 行；补上 permissive 放行策略后才得到上表结果。这条已写进第 6 节第 4 个坑。
 
-**仍未做**：业务表接入、真实运行角色与连接池、owner 绕过的单独复现。接库时用同一组用例在目标表上再跑一遍，不以模拟器代替。
+**本地业务库已接入（Day 13 补做）**：`dataagent` 库 / `app` schema 已按同一套策略建 9 张表（tenants / customers / products / orders / order_items / refunds / inventory_snapshots / shipments / sessions），运行角色 `app_rw` 非 owner、`NOBYPASSRLS`。`infra/db/verify.sh` 复测：tenant-a 看到 3 单、tenant-b 1 单、跨租户查询 0 行、无上下文 0 行、跨租户写入被 `orders_isolation` 拒绝、超级用户 4 单（绕过）、tenant-a GMV 480.00。
+
+**仍未做**：连接池下的 `SET LOCAL` 行为、owner 绕过的单独复现、云端库迁移。接入新表时用同一组用例在目标表上再跑一遍，不以模拟器代替。
 
 ## 9. 迁移与退出条件
 

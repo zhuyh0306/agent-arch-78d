@@ -59,6 +59,7 @@ PY=/Users/zhuyonghui/miniconda3/envs/py311/bin/python
 bash "$ROOT/infra/scripts/check_layout.sh"
 
 (cd "$ROOT/packages/contracts" && "$PY" -m pytest -q)
+"$PY" "$ROOT/packages/contracts/python/check_metrics.py"
 
 zsh -lic "cd $ROOT/packages/contracts && node ts/run_cases.ts && $PY check_consistency.py"
 
@@ -69,13 +70,17 @@ zsh -lic "cd $ROOT/packages/contracts && node ts/run_cases.ts && $PY check_consi
 
 - `layout ok`
 - contracts：`6 passed`；`contracts agree`
+- metrics：`20` 条，`high-risk: ['gmv', 'gross_margin', 'sell_through_rate']`，`metrics dictionary ok`
 - tenant：`5 passed`；`5 attacks denied, 1 control allowed`
 
 栈在跑时再加：
 
 ```bash
 (cd "$ROOT/infra" && ./scripts/env_check.sh && ./scripts/smoke.sh)
+(cd "$ROOT/infra/db" && ./verify.sh)
 ```
+
+业务库预期：9 张表；tenant-a 3 单、tenant-b 1 单；跨租户查询 0 行；跨租户写入被拒；无上下文 0 行。
 
 ## 3. 改提示词：标准流程
 

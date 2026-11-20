@@ -1,0 +1,312 @@
+version: 1
+domain: retail
+updated_at: "2026-11-19"
+owner: 本人
+source_status: local_created
+conventions:
+  timezone: Asia/Shanghai
+  currency: CNY
+  schema: app
+  tax: "GMV 默认含税；净销售额不含税"
+  paid_status: [paid, shipped, completed, refunded]
+  note: "本地 dataagent 库已按本字典建表（infra/db/001_tenant_schema.sql）；云端库尚未建"
+metrics:
+  - id: gmv
+    name: GMV
+    category: 销售规模
+    definition: "成交总额：商品成交价 + 运费 + 税费，不扣退款与取消。"
+    formula: "SUM(orders.gross_amount + orders.shipping_fee + orders.tax_amount) WHERE status IN paid_status AND paid_at IN window"
+    unit: CNY
+    grain: order
+    time_window: "按 paid_at 的自然日 / 自然月"
+    source: "orders.gross_amount, orders.shipping_fee, orders.tax_amount, orders.paid_at, orders.status"
+    pitfalls:
+      - "把未支付、已取消订单算进来"
+      - "退款后直接从历史 GMV 扣减，导致与旧报表不可比"
+      - "含税/不含税、含运费/不含运费没有声明"
+    miscalculation_risk: high
+
+  - id: net_sales
+    name: 净销售额
+    category: 销售规模
+    definition: "商品成交金额（不含税、不含运费）扣折扣与已完成退款后的净额。"
+    formula: "SUM(order_items.unit_price * order_items.qty - order_items.discount_amount) - SUM(refunds.amount WHERE refunds.status = 'completed')"
+    unit: CNY
+    grain: order_item + refund
+    time_window: "按订单支付时间归属，退款按退款完成时间冲减"
+    source: "order_items.unit_price, order_items.qty, order_items.discount_amount, refunds.amount, refunds.status"
+    pitfalls:
+      - "订单与退款时间窗口不对齐"
+      - "把运费和税费算进净销售额"
+      - "部分退款只扣整单"
+    miscalculation_risk: medium
+
+  - id: paid_orders
+    name: 支付订单数
+    category: 销售规模
+    definition: "时间窗口内完成支付的订单数，按 order_id 去重。"
+    formula: "COUNT(DISTINCT orders.order_id) WHERE status IN paid_status AND paid_at IN window"
+    unit: 单
+    grain: order
+    time_window: "按 paid_at"
+    source: "orders.order_id, orders.status, orders.paid_at"
+    pitfalls:
+      - "按明细行计数，拆单/多商品会重复"
+      - "把取消订单算进来"
+      - "同一订单多次支付未去重"
+    miscalculation_risk: low
+
+  - id: aov
+    name: 客单价 AOV
+    category: 销售效率
+    definition: "每笔支付订单的平均成交额。"
+    formula: "gmv / paid_orders"
+    unit: CNY / 单
+    grain: order
+    time_window: "与 GMV、支付订单数同窗口"
+    source: "gmv, paid_orders"
+    pitfalls:
+      - "分子用 GMV、分母用净销售额对应的订单，口径混用"
+      - "拆单导致客单价被低估"
+      - "分母为 0 时未处理"
+    miscalculation_risk: medium
+
+  - id: unit_price
+    name: 件单价
+    category: 销售效率
+    definition: "每件售出商品的平均成交额。"
+    formula: "gmv / SUM(order_items.qty)"
+    unit: CNY / 件
+    grain: order_item
+    time_window: "与 GMV 同窗口"
+    source: "gmv, order_items.qty"
+    pitfalls:
+      - "把赠品件数算进分母"
+      - "用净销售额除以 GMV 口径的件数"
+      - "退货件数未扣减"
+    miscalculation_risk: low
+
+  - id: attach_rate
+    name: 连带率
+    category: 销售效率
+    definition: "每笔订单平均购买的商品件数。"
+    formula: "SUM(order_items.qty) / paid_orders"
+    unit: 件 / 单
+    grain: order
+    time_window: "与支付订单数同窗口"
+    source: "order_items.qty, paid_orders"
+    pitfalls:
+      - "赠品、样品计入件数"
+      - "按 SKU 去重而不是按件数"
+      - "退货订单未剔除"
+    miscalculation_risk: low
+
+  - id: refund_rate_orders
+    name: 退款率（订单口径）
+    category: 售后
+    definition: "发生退款的订单数占支付订单数的比例。"
+    formula: "COUNT(DISTINCT refunds.order_id) / paid_orders"
+    unit: 百分比
+    grain: order
+    time_window: "退款按 refunds.created_at；订单按 paid_at，需声明归属"
+    source: "refunds.order_id, refunds.status, refunds.created_at, paid_orders"
+    pitfalls:
+      - "部分退款与整单退款混为一谈"
+      - "退款时间与下单时间窗口不一致"
+      - "取消订单被当成退款"
+    miscalculation_risk: medium
+
+  - id: refund_amount_rate
+    name: 退款金额率
+    category: 售后
+    definition: "已完成退款金额占 GMV 的比例。"
+    formula: "SUM(refunds.amount WHERE status = 'completed') / gmv"
+    unit: 百分比
+    grain: refund
+    time_window: "退款按完成时间，GMV 按支付时间，需声明归属"
+    source: "refunds.amount, refunds.status, gmv"
+    pitfalls:
+      - "分子分母时间窗口错位"
+      - "退款金额含运费/税费而 GMV 不含"
+      - "只算笔数不算金额"
+    miscalculation_risk: medium
+
+  - id: discount_rate
+    name: 折扣率
+    category: 价格
+    definition: "折扣金额占商品原价金额的比例。"
+    formula: "SUM(order_items.discount_amount) / SUM(order_items.list_amount)"
+    unit: 百分比
+    grain: order_item
+    time_window: "按订单支付时间"
+    source: "order_items.discount_amount, order_items.list_amount"
+    pitfalls:
+      - "原价用成交价代替，折扣率永远为 0"
+      - "优惠券、会员价、满减重复计算"
+      - "折扣是否含税未声明"
+    miscalculation_risk: medium
+
+  - id: gross_profit
+    name: 毛利额
+    category: 盈利
+    definition: "净销售额减去商品成本。"
+    formula: "net_sales - SUM(order_items.cost_amount * order_items.qty)"
+    unit: CNY
+    grain: order_item
+    time_window: "与净销售额同窗口"
+    source: "net_sales, order_items.cost_amount, order_items.qty"
+    pitfalls:
+      - "成本只算采购价，漏掉运费、仓储、分摊"
+      - "退款后成本未冲回"
+      - "成本口径（移动加权/先进先出）未声明"
+    miscalculation_risk: medium
+
+  - id: gross_margin
+    name: 毛利率
+    category: 盈利
+    definition: "毛利额占净销售额的比例。"
+    formula: "gross_profit / net_sales"
+    unit: 百分比
+    grain: order_item
+    time_window: "与净销售额同窗口"
+    source: "gross_profit, net_sales"
+    pitfalls:
+      - "分子用含税销售额、分母用不含税，或反过来"
+      - "成本是否含运费与分摊未声明"
+      - "退款与退货未冲减，毛利率虚高"
+    miscalculation_risk: high
+
+  - id: markup_rate
+    name: 加价率
+    category: 盈利
+    definition: "售价相对成本的加价幅度，分母是成本，不是售价。"
+    formula: "(net_sales - cogs) / cogs"
+    unit: 百分比
+    grain: order_item
+    time_window: "与净销售额同窗口"
+    source: "net_sales, cogs"
+    pitfalls:
+      - "与毛利率混用；毛利率分母是销售额，加价率分母是成本"
+      - "成本为 0 或负值时未处理"
+      - "不同品类加价率直接平均"
+    miscalculation_risk: medium
+
+  - id: sell_through_rate
+    name: 动销率
+    category: 库存效率
+    definition: "期间内发生过销售的 SKU 数占可售 SKU 数的比例。"
+    formula: "COUNT(DISTINCT sold.sku_id) / COUNT(DISTINCT available.sku_id)"
+    unit: 百分比
+    grain: sku
+    time_window: "自然月；可售口径需声明是期初还是期间任意时点"
+    source: "order_items.sku_id, inventory_snapshots.sku_id, inventory_snapshots.snapshot_date"
+    pitfalls:
+      - "分母用期初库存还是期间任意有货，结果差别很大"
+      - "卖出 1 件与卖出 10 件都算动销，未声明阈值"
+      - "新品上架时间与统计窗口不一致"
+    miscalculation_risk: high
+
+  - id: sell_out_rate
+    name: 售罄率
+    category: 库存效率
+    definition: "期间售出数量占（售出 + 期末在库）数量的比例。"
+    formula: "SUM(sold_qty) / (SUM(sold_qty) + SUM(ending_on_hand_qty))"
+    unit: 百分比
+    grain: sku
+    time_window: "自然月 / 商品生命周期，需声明"
+    source: "order_items.qty, inventory_snapshots.on_hand_qty"
+    pitfalls:
+      - "退货回库未从售出数量扣减"
+      - "期间补货导致分母口径变化"
+      - "按件数还是按金额未声明"
+    miscalculation_risk: medium
+
+  - id: inventory_turnover
+    name: 库存周转率
+    category: 库存效率
+    definition: "期间销售成本除以平均库存成本，表示库存被卖出的次数。"
+    formula: "cogs / ((beginning_inventory_cost + ending_inventory_cost) / 2)"
+    unit: 次
+    grain: sku / category
+    time_window: "自然月或年化，需声明"
+    source: "order_items.cost_amount, inventory_snapshots.inventory_cost"
+    pitfalls:
+      - "分子用销售额而不是销售成本，周转率虚高"
+      - "库存用零售价而不是成本"
+      - "期初期末平均与日均库存混用；月/年化未声明"
+    miscalculation_risk: medium
+
+  - id: inventory_days
+    name: 库存周转天数
+    category: 库存效率
+    definition: "库存周转一次平均需要的天数。"
+    formula: "period_days / inventory_turnover"
+    unit: 天
+    grain: sku / category
+    time_window: "与库存周转率同窗口"
+    source: "inventory_turnover, period_days"
+    pitfalls:
+      - "固定用 365 天但统计窗口是月"
+      - "自然日与营业日混用"
+      - "周转率为 0 时未处理"
+    miscalculation_risk: low
+
+  - id: inventory_sales_ratio
+    name: 库销比
+    category: 库存效率
+    definition: "平均库存成本与同期净销售额的比值。"
+    formula: "average_inventory_cost / net_sales"
+    unit: 比值
+    grain: sku / category
+    time_window: "与净销售额同窗口"
+    source: "inventory_snapshots.inventory_cost, net_sales"
+    pitfalls:
+      - "用期末库存而不是平均库存"
+      - "库存用零售价、销售用净额，口径不一致"
+      - "月库销比与年库销比直接比较"
+    miscalculation_risk: medium
+
+  - id: conversion_rate
+    name: 支付转化率
+    category: 流量效率
+    definition: "支付订单数占独立访客数的比例。"
+    formula: "paid_orders / COUNT(DISTINCT sessions.visitor_id)"
+    unit: 百分比
+    grain: visitor / day
+    time_window: "自然日 / 自然月；归因窗口需声明"
+    source: "paid_orders, sessions.visitor_id, sessions.started_at"
+    pitfalls:
+      - "访客与会话混用，分母被放大"
+      - "爬虫与内部流量未剔除"
+      - "跨天归因窗口未声明"
+    miscalculation_risk: medium
+
+  - id: repurchase_rate
+    name: 复购率
+    category: 用户
+    definition: "窗口内支付两次及以上的客户数占支付客户数的比例。"
+    formula: "COUNT(customer_id HAVING COUNT(DISTINCT order_id) >= 2) / COUNT(DISTINCT customer_id)"
+    unit: 百分比
+    grain: customer
+    time_window: "自然月 / 90 天 / 年，需声明"
+    source: "orders.customer_id, orders.order_id, orders.paid_at"
+    pitfalls:
+      - "同一客户同日拆单被算成复购"
+      - "退款订单未剔除"
+      - "窗口长度不同，复购率不可比"
+    miscalculation_risk: medium
+
+  - id: fulfillment_hours
+    name: 履约时长
+    category: 履约
+    definition: "从支付到签收的平均小时数。"
+    formula: "AVG(TIMESTAMPDIFF(HOUR, orders.paid_at, shipments.delivered_at))"
+    unit: 小时
+    grain: order
+    time_window: "按签收时间归属"
+    source: "orders.paid_at, shipments.delivered_at, shipments.status"
+    pitfalls:
+      - "用发货时间代替签收时间"
+      - "未签收/取消订单混入分母"
+      - "只报均值不报 P90；跨时区未统一"
+    miscalculation_risk: low

@@ -13,7 +13,7 @@
 | R6 | GitHub 推送按 IP 阻断，本地已有未推送提交 | 中 | 中 | 换可用 edge IP 或代理后重试；推送前先 `git log` 确认领先量 | 未处理 | 2026-11-24 |
 | R7 | 成本基线依赖价目表与分词器假设（tiktoken 近似 DeepSeek；月档 30,000 次为假设） | 中 | 低 | 接入真实调用后用 Langfuse 实际 token 回填；价目表带 `checked_at` 定期复核 | 已知，待校准 | 2026-11-24 |
 | R8 | VM 只有 6 GiB，同时跑另一套 milvus 栈；学习栈内存上限接近 VM 上限 | 中 | 中 | 起栈前确认可用内存；压测前停无关容器或扩 VM | 观察中 | 2026-11-24 |
-| R9 | 业务表尚未接入 `tenant_id` / RLS；第 3 周建表若漏掉，后补要改表、向量 payload、日志与记忆 | 高 | 高 | 第一张业务表起就带 `tenant_id NOT NULL` + permissive + restrictive 策略 + 越权用例；迁移评审列为阻塞项 | 未处理（前置） | 2026-11-24 |
+| R9 | 业务表未接 `tenant_id` / RLS，后补要改表、向量 payload、日志与记忆 | 高 | 高 | 已在本地 `dataagent/app` 建 9 张表：`tenant_id NOT NULL` + `FORCE RLS` + permissive/restrictive 策略 + `verify.sh`；云端库迁移时重放 `infra/db` | 已缓解（本地），云端待迁移 | 2026-11-24 |
 | R10 | 验收证据层级偏低：L1 设计 / L2 模拟被当成 L3 运行结果（RLS restrictive-only 全拒未被发现） | 高 | 中 | 每条验收标 L1–L4；运行期结论必须 L3；评审抽查证据层级 | 已识别，执行中 | 2026-11-24 |
 | R11 | 故障域策略未做故障注入；「治理层挂了只读可继续」等结论只是设计 | 中 | 高 | Runtime 最小闭环后，对 Gateway / 治理层 / LiteLLM / DB 各注入一次故障并记录降级 | 未处理 | 2026-11-24 |
 | R12 | HITL 只有设计，无审批 UI、队列与超时；有变成 human-in-the-loop theater 的风险 | 中 | 中 | 先落 H2 审批 + 超时默认拒绝 + 真拒绝路径，再谈其他点位；用一次真实审批演练验证 | 未处理 | 2026-11-24 |

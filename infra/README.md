@@ -68,6 +68,20 @@ podman compose down          # 保留数据卷
 podman compose down -v       # 连数据一起删，下次重新初始化 Langfuse 项目
 ```
 
+## Day 13 业务库
+
+指标字典需要 8 张源表，业务数据放在独立的 `dataagent` 库（不复用 Langfuse 的 `postgres` 库）：
+
+```bash
+cd infra
+podman compose up -d postgres
+cd db
+./apply.sh    # 建库 + 001 schema + 002 seed
+./verify.sh   # 9 张表、租户隔离、跨租户写入、fail closed、超级用户绕过
+```
+
+细节见 [`db/README.md`](db/README.md)。约定：所有租户表 `tenant_id NOT NULL` + `FORCE ROW LEVEL SECURITY`，运行角色 `app_rw` 非 owner、`NOBYPASSRLS`；新表漏掉这两项视为未完成。
+
 ## 止损
 
 原文规则：任何一步卡住超过 15 分钟，停止死磕，改为查文档或换最小简化实现。本目录的两处简化就是这条规则的产物：用本机 Ollama 代替云端模型；如果 Langfuse 起不来，先只保留 postgres/redis/qdrant/litellm 四个服务，把 trace 留到问题定位后再补。

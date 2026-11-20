@@ -85,7 +85,7 @@ flowchart TB
 | 能力层 · 工具 | 只读 SQL、检索、文档查询 | 未实现 | 工具白名单在 Harness 侧 |
 | 能力层 · 记忆 | mem0 + Qdrant 长期记忆，上下文短期记忆 | Qdrant 已起；mem0 未接 | 记忆必须按 tenant 分区 |
 | 能力层 · 契约 | Day 8 TaskContract | Python / TS 双份已通过 fixture | 失败码进 Trace，重试在 Runtime |
-| 数据层 · Postgres | 业务数据、Langfuse 元数据、审计事件 | 容器已起 | 租户隔离方式 Day 11 定 |
+| 数据层 · Postgres | 业务数据（`dataagent` 库）+ Langfuse 元数据（独立 `postgres` 库） | `dataagent/app` 9 张表已建，RLS 已开 | 云端库未迁移；连接池 `SET LOCAL` 未验证 |
 | 数据层 · Qdrant | 向量索引 | 容器已起 | payload 必须带 `tenant_id` |
 | 数据层 · ClickHouse | Langfuse trace 明细 | 容器已起 | 日志同样带 `tenant_id` |
 | 数据层 · MinIO | Langfuse 对象存储 | 容器已起 | 不直接面向业务 |
